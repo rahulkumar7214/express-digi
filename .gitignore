@@ -1,0 +1,3 @@
+node_modules/ 
+
+# the above line will ignore the node_modules directory from being tracked by git. 
