@@ -1,25 +1,33 @@
 import express from "express"; // this is ES6 syntax for importing modules
 
+import logger from "./logger.js"; // this is how we import a module from a file in node.js
+import morgan from "morgan";
+
 const app = express(); // create an express app which means we are creating a server 
 const port = 3000;
-
-/*
-app.get("/", (req, res) => {
-  res.send("Hello from Hitesh and his tea!");
-});
-
-app.get("/ice-tea", (req, res) => {
-  res.send("What ice tea would you  prefer?");
-});
-
-app.get("/twitter", (req, res) => {
-  res.send("rahuldotcom");
-});
-*/
 
 //it is a simple crud application to add, update, delete and get the tea data from the server 
 
 app.use(express.json()); // this is a middleware to parse the incoming request body as JSON from the client(frontend)
+
+//used for the loging details
+const morganFormat = ":method :url :status :response-time ms";// this is the format of the logs that will be printed on the console
+app.use( // this is a middleware to log the incoming requests to the server
+  morgan(morganFormat, { 
+    stream: { 
+      write: (message) => {
+        const logObject = {
+          method: message.split(" ")[0],
+          url: message.split(" ")[1],
+          status: message.split(" ")[2],
+          responseTime: message.split(" ")[3],
+        };
+        logger.info(JSON.stringify(logObject));
+      },
+    },
+  })
+);
+//  used for the loging details
 
 let teaData = []; // this is an array to store the tea data
 let nextId = 1; // this is a variable to store the next id for the tea
@@ -27,6 +35,7 @@ let nextId = 1; // this is a variable to store the next id for the tea
 // add a new tea
 app.post("/teas", (req, res) => {  // this states that when a POST request is made to /teas, the following function will be executed
   // post request is used to add a new resource
+  // console.log("POST"); 
   
   const { name, price } = req.body;  // this line is used to extract the name and price from the request body sent by the client 
 
